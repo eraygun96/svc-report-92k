@@ -1,0 +1,441 @@
+<title>Pin Drinks Organizasyon Şeması</title>
+<style>
+  :root{
+    --paper:#f5f4f0;
+    --ink:#1b2130;
+    --muted:#68707e;
+    --line:#98a1b3;
+    --box-bg:#1c2c52;
+    --box-bg-ceo:#101a35;
+    --on-navy:#f3f5f9;
+    --on-navy-muted:#aab6d1;
+    --module-bg:#eceae3;
+    --module-border:#b7bccb;
+    --agg-border:#a9762f;
+    --agg-text:#7a541f;
+    --paper-rgb:245,244,240;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#15171d;
+      --ink:#e9eaee;
+      --muted:#9aa1b0;
+      --line:#4a4f5e;
+      --module-bg:#1f222b;
+      --module-border:#3c4150;
+      --agg-border:#c99446;
+      --agg-text:#e0b378;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#15171d;
+    --ink:#e9eaee;
+    --muted:#9aa1b0;
+    --line:#4a4f5e;
+    --module-bg:#1f222b;
+    --module-border:#3c4150;
+    --agg-border:#c99446;
+    --agg-text:#e0b378;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+
+  .toolbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 22px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:rgba(var(--paper-rgb),.92); backdrop-filter:blur(6px);
+    z-index:5;
+  }
+  .toolbar .info{ font-size:12px; color:var(--muted); }
+  .toolbar button{
+    font:inherit; font-size:13px; font-weight:600; letter-spacing:.02em;
+    background:var(--box-bg); color:var(--on-navy); border:none; border-radius:6px;
+    padding:8px 16px; cursor:pointer;
+  }
+  .toolbar button:focus-visible{ outline:2px solid var(--agg-border); outline-offset:2px; }
+  .toolbar button:hover{ filter:brightness(1.15); }
+
+  .stage{ overflow-x:auto; padding:26px 18px 40px; display:flex; justify-content:center; }
+
+  #page{
+    width:281mm; min-height:194mm;
+    background:transparent;
+  }
+
+  header.title-block{ text-align:center; margin-bottom:10px; }
+  header.title-block .wordmark{
+    font-weight:800; font-size:20px; letter-spacing:.12em; color:var(--ink);
+  }
+  header.title-block .wordmark span{ font-weight:400; font-size:10px; letter-spacing:.35em; display:block; color:var(--muted); margin-top:1px;}
+  header.title-block h1{
+    font-size:13px; font-weight:600; letter-spacing:.06em; margin:6px 0 0; color:var(--muted);
+    text-transform:uppercase;
+  }
+
+  /* ---- core tree mechanics ---- */
+  #chart{ display:flex; justify-content:center; }
+  .branch{ display:flex; flex-direction:column; align-items:center; }
+  .stem{ width:1px; height:9px; background:var(--line); flex:none; }
+  .children-row{ display:flex; justify-content:center; }
+  .children-row > .branch{
+    position:relative; padding:9px 7px 0 7px;
+  }
+  .children-row > .branch::before,
+  .children-row > .branch::after{
+    content:""; position:absolute; top:0; right:50%;
+    border-top:1px solid var(--line); width:50%; height:9px;
+  }
+  .children-row > .branch::after{ right:auto; left:50%; border-left:1px solid var(--line); }
+  .children-row > .branch:only-child{ padding-top:0; }
+  .children-row > .branch:only-child::before,
+  .children-row > .branch:only-child::after{ display:none; }
+  .children-row > .branch:first-child::before{ border-top:none; }
+  .children-row > .branch:last-child::after{ border-top:none; }
+
+  /* ---- node box ---- */
+  .node{
+    background:var(--box-bg); color:var(--on-navy);
+    border-radius:4px; padding:4px 7px;
+    width:29mm; min-height:11mm;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; gap:1px;
+  }
+  .node .name{ font-size:7px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
+  .node .title{ font-size:6px; font-style:italic; color:var(--on-navy-muted); line-height:1.15; }
+  .node.ceo{ background:var(--box-bg-ceo); width:40mm; min-height:14mm; padding:6px 10px; }
+  .node.ceo .name{ font-size:9.5px; }
+  .node.ceo .title{ font-size:7px; }
+
+  /* ---- module (compact stacked list for flat teams) ---- */
+  .module{
+    border:1px solid var(--module-border); background:var(--module-bg);
+    border-radius:4px; padding:3px; display:flex; flex-direction:column; gap:3px;
+    width:29mm;
+  }
+  .module-group{ display:flex; align-items:stretch; gap:3px; }
+  .module-group .glabel{
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    font-size:5.6px; font-weight:700; letter-spacing:.08em; color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+    border-right:1px solid var(--module-border); padding:1px 1.5px; flex:none;
+  }
+  .mrows{ display:flex; flex-direction:column; gap:1.6px; flex:1; min-width:0; }
+  .mrow{ line-height:1.1; }
+  .mrow b{ display:block; font-size:6px; font-weight:700; text-transform:uppercase; color:var(--ink); }
+  .mrow .t{ display:block; font-size:5.3px; font-style:italic; color:var(--muted); }
+  .mrow.nested{ margin-left:5px; padding-left:3px; border-left:1px dashed var(--module-border); }
+  .mrow.agg{ border:1px dashed var(--agg-border); border-radius:3px; padding:1.5px 3px; }
+  .mrow.agg b{ color:var(--agg-text); }
+  .mrow.agg .t{ color:var(--agg-text); }
+
+  footer.note{
+    max-width:281mm; margin:14px auto 0; font-size:9.5px; color:var(--muted); text-align:center;
+    display:flex; flex-direction:column; gap:3px;
+  }
+  footer.note .legend{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+  footer.note .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  footer.note .swatch{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+  footer.note .swatch.person{ background:var(--box-bg); }
+  footer.note .swatch.agg{ border:1px dashed var(--agg-border); }
+
+  @media print{
+    @page{ size:A4 landscape; margin:8mm; }
+    body{ background:#fff; }
+    .toolbar{ display:none; }
+    .stage{ padding:0; overflow:visible; }
+    #page{ width:auto; }
+  }
+</style>
+
+<div class="toolbar">
+  <div class="info">Pin Drinks · Organizasyon Şeması · Kolay İK API'den güncel veriyle üretildi</div>
+  <button id="printBtn" type="button">Yazdır / PDF olarak kaydet</button>
+</div>
+
+<div class="stage">
+<div id="page">
+
+  <header class="title-block">
+    <div class="wordmark">PIN DRINKS<span>ORGANİZASYON ŞEMASI</span></div>
+  </header>
+
+  <div id="chart">
+    <div class="branch">
+      <div class="node ceo"><span class="name">Emre Sever</span><span class="title">CEO &amp; Board Member</span></div>
+      <div class="stem"></div>
+
+      <div class="children-row">
+
+        <!-- 1. Mehmet Suphi Tatari -->
+        <div class="branch">
+          <div class="node"><span class="name">Mehmet Suphi Tatari</span><span class="title">İhracat Müdürü</span></div>
+          <div class="stem"></div>
+          <div class="children-row">
+            <div class="branch">
+              <div class="node"><span class="name">Batuhan Avşar</span><span class="title">İhracat Satış Yöneticisi</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Serkan Atılgan -->
+        <div class="branch">
+          <div class="node"><span class="name">Serkan Atılgan</span><span class="title">Finans Koordinatörü</span></div>
+          <div class="stem"></div>
+          <div class="children-row">
+            <div class="branch">
+              <div class="node"><span class="name">Merve Çakıroğlu</span><span class="title">Mali ve İdari İşler Müdürü</span></div>
+              <div class="stem"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">MUHASEBE</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Murat Yavuz</b><span class="t">Muhasebe Yöneticisi</span></div>
+                    <div class="mrow"><b>Yasemin Selçuk Bakır</b><span class="t">Muhasebe Yöneticisi</span></div>
+                    <div class="mrow"><b>Merve Murtçu</b><span class="t">Muhasebe Uzmanı</span></div>
+                    <div class="mrow"><b>Derya Nur Katmer</b><span class="t">Muhasebe Uzm. Yrd.</span></div>
+                  </div>
+                </div>
+                <div class="module-group">
+                  <div class="glabel">İK</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Adriana Ceren Polat</b><span class="t">İK Uzmanı</span></div>
+                    <div class="mrow"><b>Ezgi Boz</b><span class="t">İK Uzmanı</span></div>
+                    <div class="mrow nested"><b>↳ Pınar Hanım</b><span class="t">İK Stajyeri</span></div>
+                    <div class="mrow"><b>Meryem Gül</b><span class="t">İK Uzm. Yrd.</span></div>
+                  </div>
+                </div>
+                <div class="module-group">
+                  <div class="glabel">İDARİ</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Osman Savaş</b><span class="t">Yönetici Asistanı</span></div>
+                    <div class="mrow"><b>Uğur Kaya</b><span class="t">Banko Karşılama Grv.</span></div>
+                    <div class="mrow"><b>Emel Akın Yılmaz</b><span class="t">Ofis Hizmet Grv.</span></div>
+                    <div class="mrow"><b>Tülay Canpolat</b><span class="t">Ofis Hizmet Grv.</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Mehmet Tansu Bayar -->
+        <div class="branch">
+          <div class="node"><span class="name">Mehmet Tansu Bayar</span><span class="title">Genel Koordinatör</span></div>
+          <div class="stem"></div>
+          <div class="children-row">
+
+            <div class="branch">
+              <div class="node"><span class="name">Emrah Doğan</span><span class="title">Bölge Satış Müdürü</span></div>
+              <div class="stem"></div>
+              <div class="children-row">
+                <div class="branch">
+                  <div class="node"><span class="name">Gamze Öner</span><span class="title">İzmir Bölge Satış Yön.</span></div>
+                  <div class="stem"></div>
+                  <div class="children-row">
+                    <div class="branch">
+                      <div class="node"><span class="name">Umut Can Arıcan</span><span class="title">Satış Destek (Merch)</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="branch">
+              <div class="node"><span class="name">Ozan Barış Tan</span><span class="title">Bölge Satış Müdürü</span></div>
+              <div class="stem"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">BÖLGE</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Emrah Albayrak</b><span class="t">G.Marmara Bölge S.Y.</span></div>
+                    <div class="mrow"><b>Ferhat Uzun</b><span class="t">İstanbul Bölge S.Y.</span></div>
+                    <div class="mrow"><b>Muhammet Karayanız</b><span class="t">İst. Anadolu Bölge S.Y.</span></div>
+                    <div class="mrow"><b>Onur Yıldız</b><span class="t">İç Anadolu Bölge S.Y.</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="branch">
+              <div class="node"><span class="name">Murat Kılıç</span><span class="title">Depo ve Lojistik Müdürü</span></div>
+              <div class="stem"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">DEPO / LOJ.</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Mehmet Kadir Özbey</b><span class="t">Depo Şefi</span></div>
+                    <div class="mrow"><b>Yunus Emre Öztürk</b><span class="t">Depo Sorumlusu</span></div>
+                    <div class="mrow"><b>Ebru Oktay</b><span class="t">Lojistik ve Op. Uzm.</span></div>
+                    <div class="mrow"><b>Emirhan Kabul</b><span class="t">Depo/Loj. Op. Uzm.Yrd.</span></div>
+                    <div class="mrow"><b>Hülya Akpınar</b><span class="t">Depo Hizmet Grv.</span></div>
+                    <div class="mrow"><b>Engin Geniş</b><span class="t">Forklift Operatörü</span></div>
+                    <div class="mrow agg"><b>Depo Personeli</b><span class="t">3 kişi</span></div>
+                    <div class="mrow agg"><b>Sevkiyat Personeli</b><span class="t">4 kişi</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="branch">
+              <div class="node" style="visibility:hidden;height:0;min-height:0;padding:0;margin:0;"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">DİĞER</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Abdullah Şekerci</b><span class="t">Filo Yönetimi Uzmanı</span></div>
+                    <div class="mrow"><b>Ömer Pulatoğlu</b><span class="t">Satın Alma Uzm. Yrd.</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. Barış Konca -->
+        <div class="branch">
+          <div class="node"><span class="name">Barış Konca</span><span class="title">Kurucu &amp; Arge Müdürü</span></div>
+          <div class="stem"></div>
+          <div class="module">
+            <div class="module-group">
+              <div class="glabel">ÜRETİM</div>
+              <div class="mrows">
+                <div class="mrow"><b>Mehmet Orhan</b><span class="t">Üretim Yöneticisi</span></div>
+                <div class="mrow"><b>Bayram Yılmaz</b><span class="t">Üretim Kontrol Yön.</span></div>
+                <div class="mrow"><b>Emre Yıldırım</b><span class="t">Kalite Yöneticisi</span></div>
+                <div class="mrow"><b>Batuhan Kemençe</b><span class="t">Üretim Sorumlusu</span></div>
+                <div class="mrow"><b>Ahmet Burak Ulaş</b><span class="t">Üretim Uzm. Yrd.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Durmuş Eray Aygün -->
+        <div class="branch">
+          <div class="node"><span class="name">Durmuş Eray Aygün</span><span class="title">Marka Yöneticisi</span></div>
+          <div class="stem"></div>
+          <div class="module">
+            <div class="module-group">
+              <div class="glabel">MARKA</div>
+              <div class="mrows">
+                <div class="mrow"><b>Ömer Terzi</b><span class="t">E-Ticaret Uzmanı</span></div>
+                <div class="mrow"><b>Emin Samet Sefer</b><span class="t">IT Uzmanı</span></div>
+                <div class="mrow"><b>Selçuk Alcı</b><span class="t">Müşteri İlişkileri Uzm.</span></div>
+                <div class="mrow"><b>Emirhan Aydın</b><span class="t">Pazarlama Asistanı</span></div>
+                <div class="mrow"><b>Furkan Kalafat</b><span class="t">Pazarlama Op. Uzm.Yrd.</span></div>
+                <div class="mrow"><b>Sena Saltoğlu</b><span class="t">Pazarlama Süpervizörü</span></div>
+                <div class="mrow"><b>Emre Ağaoğlu</b><span class="t">Pazarlama Stajyeri</span></div>
+                <div class="mrow"><b>Sude Kaletaş</b><span class="t">Pazarlama Stajyeri</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Başak Dursun Aslan -->
+        <div class="branch">
+          <div class="node"><span class="name">Başak Dursun Aslan</span><span class="title">Satış Koordinatörü</span></div>
+          <div class="stem"></div>
+          <div class="children-row">
+
+            <div class="branch">
+              <div class="node" style="visibility:hidden;height:0;min-height:0;padding:0;margin:0;"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">SATIŞ OP.</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Çağatay Nergis</b><span class="t">Alternatif Kanal Yön.</span></div>
+                    <div class="mrow"><b>Sena Yılmaz</b><span class="t">Zincir Mağazalar S.M.</span></div>
+                    <div class="mrow"><b>Zekiye Uluada Aygün</b><span class="t">E-Ticaret Satış Uzm.</span></div>
+                    <div class="mrow"><b>Yasemin Köysürenbars</b><span class="t">Satış Asistanı</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="branch">
+              <div class="node"><span class="name">Mert Günay Altın</span><span class="title">Saha Satış &amp; Op. Yön.</span></div>
+              <div class="stem"></div>
+              <div class="children-row">
+                <div class="branch">
+                  <div class="node"><span class="name">Aleyna Çakıcı Türk</span><span class="title">Supervisor</span></div>
+                  <div class="stem"></div>
+                  <div class="children-row">
+                    <div class="branch">
+                      <div class="node" style="border:1px dashed var(--agg-border); background:transparent; color:var(--agg-text);">
+                        <span class="name" style="text-transform:none; font-weight:700;">Satış Destek Personeli (Merch)</span>
+                        <span class="title" style="color:var(--agg-text); font-style:normal;">24 kişi</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="branch">
+              <div class="node"><span class="name">Uğur Bektüre</span><span class="title">Satış ve İş Gel. Yön.</span></div>
+              <div class="stem"></div>
+              <div class="module">
+                <div class="module-group">
+                  <div class="glabel">HORECA</div>
+                  <div class="mrows">
+                    <div class="mrow"><b>Barış Kaymak</b><span class="t">Bölge Satış Yön. (Horeca)</span></div>
+                    <div class="mrow"><b>Reşat Yiğit Yolcu</b><span class="t">Bölge Satış Yön. (Horeca)</span></div>
+                    <div class="mrow"><b>Şerif Ahmet Özümer</b><span class="t">Saha Op. Sorumlusu (H.)</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">
+    <div class="legend">
+      <span><span class="swatch person"></span> İsim + unvan kutusu</span>
+      <span><span class="swatch agg"></span> Aynı yöneticiye bağlı, aynı unvana sahip ≥3 kişilik ekipler tek kutuda toplulaştırılmıştır</span>
+    </div>
+    <div>Nergiz Konukçu: Kolay İK'da departman/yönetici bilgisi tanımlı olmadığı için şemaya işlenemedi. · Üretim tarihi: <span id="genDate"></span></div>
+  </footer>
+
+</div>
+</div>
+
+<script>
+  document.getElementById('genDate').textContent = new Date().toLocaleDateString('tr-TR', { day:'2-digit', month:'long', year:'numeric' });
+
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+  function fitToPage(){
+    const page = document.getElementById('page');
+    const chart = document.getElementById('chart');
+    chart.style.transform = 'none';
+    const pageWidthPx = page.clientWidth;
+    const chartRect = chart.getBoundingClientRect();
+    const scale = Math.min(1, pageWidthPx / chartRect.width);
+    chart.style.transformOrigin = 'top center';
+    chart.style.transform = `scale(${scale})`;
+    if (scale < 1) {
+      page.style.minHeight = (chartRect.height * scale + 40) + 'px';
+    }
+  }
+
+  window.addEventListener('beforeprint', fitToPage);
+  window.addEventListener('afterprint', () => {
+    document.getElementById('chart').style.transform = 'none';
+  });
+  if (window.matchMedia) {
+    window.matchMedia('print').addEventListener('change', (mql) => {
+      if (mql.matches) fitToPage();
+    });
+  }
+</script>
