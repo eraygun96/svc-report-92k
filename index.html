@@ -21,7 +21,7 @@
     --paper:#15171d; --ink:#e9eaee; --muted:#9aa1b0; --line:#4a4f5e;
     --module-bg:#1f222b; --module-border:#3c4150; --agg-border:#c99446; --agg-text:#e0b378;
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
   body{ margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
   .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 22px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(var(--paper-rgb),.92); backdrop-filter:blur(6px); z-index:5; }
   .toolbar .info{ font-size:12px; color:var(--muted); }
@@ -69,6 +69,7 @@
   footer.note .swatch.agg{ border:1px dashed var(--agg-border); }
   @media print{
     @page{ size:A4 landscape; margin:8mm; }
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
     body{ background:#fff; }
     .toolbar{ display:none; }
     .stage{ padding:0; overflow:visible; }
@@ -112,7 +113,7 @@
       <span><span class="swatch person"></span> İsim + unvan kutusu</span>
       <span><span class="swatch agg"></span> Aynı yöneticiye bağlı, aynı unvana sahip ≥3 kişilik ekipler tek kutuda toplulaştırılmıştır</span>
     </div>
-    <div>Güncellenme tarihi: 24 Ağustos 2026 16:36</div>
+    <div>Güncellenme tarihi: 24 Ağustos 2026 17:07</div>
   </footer>
 </div>
 </div>
